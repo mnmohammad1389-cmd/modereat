@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت ربات تلگرام</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tahoma', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           LOGIN PAGE
+           ============================================================ */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            background: #fff;
+            border-radius: 28px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header .icon {
+            font-size: 64px;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .login-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .login-form .input-group {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .login-form .input-group i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        .login-form .input-group input {
+            width: 100%;
+            padding: 14px 48px 14px 20px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            font-size: 16px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .login-form .input-group input:focus {
+            border-color: #667eea;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-error {
+            margin-top: 14px;
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
+        .main-page {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            width: 270px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 25px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 28px 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-header i {
+            font-size: 30px;
+            color: #667eea;
+        }
+
+        .sidebar-header span {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 18px 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-right: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .sidebar-nav a.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #fff;
+            border-right-color: #667eea;
+        }
+
+        .sidebar-nav a i {
+            width: 24px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar-nav .logout-btn {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ff6b6b;
+        }
+
+        .sidebar-nav .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.12);
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            margin-right: 270px;
+            padding: 30px 35px;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #e8e8e8;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .top-bar h2 {
+            font-size: 24px;
+            color: #222;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            background: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ============================================================
+           TABS
+           ============================================================ */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           CARDS
+           ============================================================ */
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            padding: 20px 26px;
+            background: linear-gradient(135deg, #fafbfc 0%, #fff 100%);
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            color: #222;
+        }
+
+        .card-body {
+            padding: 26px;
+        }
+
+        /* ============================================================
+           FORM ELEMENTS
+           ============================================================ */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fafbfc;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .hint {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint i {
+            color: #667eea;
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+
+        /* ============================================================
+           RESULTS
+           ============================================================ */
+        .result {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        /* ============================================================
+           STATS GRID
+           ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 22px 16px;
+            border-radius: 14px;
+            text-align: center;
+            border: 2px solid #e8e8e8;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        .stat-item i {
+            font-size: 34px;
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .online-text {
+            color: #2ecc71;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar-header span,
+            .sidebar-nav a span {
+                display: none;
+            }
+            .sidebar-nav a {
+                padding: 14px;
+                justify-content: center;
+            }
+            .sidebar-nav a i {
+                font-size: 22px;
+                margin: 0;
+            }
+            .main-content {
+                margin-right: 80px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            .login-header h1 {
+                font-size: 22px;
+            }
+            .main-content {
+                padding: 14px;
+            }
+            .top-bar h2 {
+                font-size: 18px;
+            }
+            .card-body {
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+    LOGIN PAGE
+    ============================================================ -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <span class="icon">🤖</span>
+                <h1>پنل مدیریت</h1>
+                <p>ورود به سیستم مدیریت ربات فروشگاهی</p>
+            </div>
+            <div class="login-form">
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="passwordInput" placeholder="رمز عبور را وارد کنید..." />
+                </div>
+                <button onclick="login()" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> ورود
+                </button>
+                <div id="loginError" class="login-error"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MAIN PAGE
+    ============================================================ -->
+    <div id="mainPage" class="main-page">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-robot"></i>
+                <span>مدیریت ربات</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="active" data-tab="send">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>ارسال پیام</span>
+                </a>
+                <a href="#" data-tab="broadcast">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>پیام همگانی</span>
+                </a>
+                <a href="#" data-tab="search">
+                    <i class="fas fa-search"></i>
+                    <span>جستجوی کاربر</span>
+                </a>
+                <a href="#" data-tab="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>آمار ربات</span>
+                </a>
+                <a href="#" onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>خروج</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            <!-- TOP BAR -->
+            <div class="top-bar">
+                <h2 id="pageTitle">📨 ارسال پیام</h2>
+                <div class="bot-status">
+                    <span class="status-dot"></span>
+                    <span>ربات آنلاین</span>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            TAB: SEND MESSAGE
+            ========================================================== -->
+            <div id="tab-send" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user"></i>
+                        <h3>ارسال پیام به کاربر</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label><i class="fas fa-id-badge"></i> آیدی عددی کاربر (Telegram ID)</label>
+                            <input type="text" id="singleUserId" placeholder="مثال: 8927319569" />
+                            <div class="hint">
+                                <i class="fas fa-info-circle"></i>
+                                آیدی کاربر رو از @userinfobot بگیر
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-comment"></i> متن پیام</label>
+                            <textarea id="singleMessage" rows="4" placeholder="متن پیام را وارد کنید..."></textarea>
+                            <div class="hint">
+                                <i class="fas fa-info-circle"></i>
+                                می‌توانید از HTML استفاده کنید: <b>متن پررنگ</b>, <i>متن ایتالیک</i>
+                            </div>
+                        </div>
+                        <button onclick="sendSingleMessage()" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> ارسال پیام
+                        </button>
+                        <div id="singleResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            TAB: BROADCAST
+            ========================================================== -->
+            <div id="tab-broadcast" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-users"></i>
+                        <h3>ارسال پیام همگانی</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label><i class="fas fa-list"></i> لیست آیدی کاربران</label>
+                            <textarea id="broadcastUsers" rows="5" placeholder="8927319569&#10;123456789&#10;987654321"></textarea>
+                            <div class="hint">
+                                <i class="fas fa-info-circle"></i>
+                                هر خط یک آیدی
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-comment-dots"></i> متن پیام</label>
+                            <textarea id="broadcastMessage" rows="4" placeholder="متن پیام همگانی..."></textarea>
+                        </div>
+                        <button onclick="sendBroadcast()" class="btn btn-success">
+                            <i class="fas fa-bullhorn"></i> ارسال همگانی
+                        </button>
+                        <div id="broadcastResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            TAB: SEARCH
+            ========================================================== -->
+            <div id="tab-search" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-search"></i>
+                        <h3>جستجوی کاربر</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label><i class="fas fa-id-badge"></i> آیدی کاربر</label>
+                            <input type="text" id="searchUserId" placeholder="آیدی عددی کاربر" />
+                        </div>
+                        <button onclick="searchUser()" class="btn btn-info">
+                            <i class="fas fa-search"></i> جستجو
+                        </button>
+                        <div id="userInfo" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            TAB: STATS
+            ========================================================== -->
+            <div id="tab-stats" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>آمار ربات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <i class="fas fa-robot"></i>
+                                <span class="stat-label">نام ربات</span>
+                                <span class="stat-value" id="botName">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-at"></i>
+                                <span class="stat-label">یوزرنیم</span>
+                                <span class="stat-value" id="botUsername">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span class="stat-label">وضعیت</span>
+                                <span class="stat-value online-text">🟢 آنلاین</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-id-card"></i>
+                                <span class="stat-label">آیدی ادمین</span>
+                                <span class="stat-value">8927319569</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /main-content -->
+    </div><!-- /main-page -->
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        // ============================================================
+        // CONFIG
+        // ============================================================
+        const ADMIN_PASSWORD = 'admin123456';
+        const API_BASE = window.location.origin; // از آدرس سایت استفاده کن
+
+        // ============================================================
+        // LOGIN
+        // ============================================================
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!password) {
+                errorDiv.textContent = '❌ لطفاً رمز عبور را وارد کنید';
+                return;
+            }
+
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('adminPassword', password);
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'flex';
+                loadStats();
+                errorDiv.textContent = '';
+            } else {
+                errorDiv.textContent = '❌ رمز عبور اشتباه است';
+            }
+        }
+
+        // Enter key for login
+        document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Auto-login if password stored
+        window.onload = function() {
+            const password = localStorage.getItem('adminPassword');
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'flex';
+                loadStats();
+            }
+        };
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function logout() {
+            localStorage.removeItem('adminPassword');
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').textContent = '';
+        }
+
+        // ============================================================
+        // TABS
+        // ============================================================
+        document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Active class
+                document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+                    a.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Show tab
+                const tabId = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(function(tab) {
+                    tab.classList.remove('active');
+                });
+                document.getElementById('tab-' + tabId).classList.add('active');
+
+                // Update title
+                const titles = {
+                    'send': '📨 ارسال پیام',
+                    'broadcast': '📢 پیام همگانی',
+                    'search': '🔍 جستجوی کاربر',
+                    'stats': '📊 آمار ربات'
+                };
+                document.getElementById('pageTitle').textContent = titles[tabId] || 'پنل مدیریت';
+            });
+        });
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function showResult(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'result show ' + type;
+            clearTimeout(el._timeout);
+            el._timeout = setTimeout(function() {
+                el.className = 'result';
+            }, 8000);
+        }
+
+        function getPassword() {
+            return localStorage.getItem('adminPassword') || '';
+        }
+
+        // ============================================================
+        // 1. SEND SINGLE MESSAGE
+        // ============================================================
+        async function sendSingleMessage() {
+            const userId = document.getElementById('singleUserId').value.trim();
+            const message = document.getElementById('singleMessage').value.trim();
+
+            if (!userId || !message) {
+                showResult('singleResult', '❌ لطفاً هم userId و هم پیام را وارد کنید', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/send-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, message })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showResult('singleResult', '✅ ' + data.message, 'success');
+                    document.getElementById('singleUserId').value = '';
+                    document.getElementById('singleMessage').value = '';
+                } else {
+                    showResult('singleResult', '❌ ' + data.error, 'error');
+                }
+            } catch (err) {
+                showResult('singleResult', '❌ خطا در ارتباط با سرور', 'error');
+            }
+        }
+
+        // Ctrl+Enter for single message
+        document.getElementById('singleMessage').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                sendSingleMessage();
+            }
+        });
+
+        // ============================================================
+        // 2. BROADCAST
+        // ============================================================
+        async function sendBroadcast() {
+            const usersText = document.getElementById('broadcastUsers').value.trim();
+            const message = document.getElementById('broadcastMessage').value.trim();
+
+            if (!usersText || !message) {
+                showResult('broadcastResult', '❌ لطفاً لیست کاربران و پیام را وارد کنید', 'error');
+                return;
+            }
+
+            const userIds = usersText.split('\n')
+                .map(function(id) { return id.trim(); })
+                .filter(function(id) { return id !== ''; });
+
+            if (userIds.length === 0) {
+                showResult('broadcastResult', '❌ حداقل یک آیدی معتبر وارد کنید', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/broadcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userIds, message })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const s = data.stats;
+                    let msg = '📊 نتیجه ارسال همگانی:\n';
+                    msg += '✅ موفق: ' + s.success + ' از ' + s.total + '\n';
+                    msg += '❌ ناموفق: ' + s.failed;
+                    if (s.failedUsers && s.failedUsers.length) {
+                        msg += '\n📋 آیدی‌های ناموفق:\n' + s.failedUsers.join('\n');
+                    }
+                    showResult('broadcastResult', msg, s.success === s.total ? 'success' : 'info');
+
+                    if (s.success === s.total) {
+                        document.getElementById('broadcastUsers').value = '';
+                        document.getElementById('broadcastMessage').value = '';
+                    }
+                }
+            } catch (err) {
+                showResult('broadcastResult', '❌ خطا در ارتباط با سرور', 'error');
+            }
+        }
+
+        // Ctrl+Enter for broadcast
+        document.getElementById('broadcastMessage').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                sendBroadcast();
+            }
+        });
+
+        // ============================================================
+        // 3. SEARCH USER
+        // ============================================================
+        async function searchUser() {
+            const userId = document.getElementById('searchUserId').value.trim();
+
+            if (!userId) {
+                showResult('userInfo', '❌ لطفاً آیدی کاربر را وارد کنید', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/user/' + userId);
+                const data = await res.json();
+
+                if (data.success) {
+                    const u = data.user;
+                    let info = '👤 اطلاعات کاربر:\n';
+                    info += '🆔 آیدی: ' + u.id + '\n';
+                    info += '📛 نام: ' + u.firstName + '\n';
+                    if (u.lastName) info += '👨‍👩‍👧 نام خانوادگی: ' + u.lastName + '\n';
+                    if (u.username) info += '@' + u.username + '\n';
+                    info += '🤖 ' + (u.isBot ? 'این کاربر یک ربات است' : 'این کاربر واقعی است');
+                    showResult('userInfo', info, 'info');
+                } else {
+                    showResult('userInfo', '❌ ' + data.error, 'error');
+                }
+            } catch (err) {
+                showResult('userInfo', '❌ خطا در ارتباط با سرور', 'error');
+            }
+        }
+
+        // Enter key for search
+        document.getElementById('searchUserId').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') searchUser();
+        });
+
+        // ============================================================
+        // 4. LOAD STATS
+        // ============================================================
+        async function loadStats() {
+            try {
+                const res = await fetch(API_BASE + '/api/stats');
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('botName').textContent = data.stats.botName;
+                    document.getElementById('botUsername').textContent = '@' + data.stats.botUsername;
+                }
+            } catch (err) {
+                console.error('خطا در دریافت آمار:', err);
+            }
+        }
+    </script>
+
+</body>
+</html>
